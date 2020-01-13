@@ -10,28 +10,40 @@ import numpy as np
 def get_dataloaders(dataset_name, batch_size, num_workers=20):
     trainset, testset = _datasets_get_func[dataset_name]()
     dataloader = partial(torch.utils.data.DataLoader, batch_size=batch_size, num_workers=num_workers, pin_memory=True)
-    return dataloader(trainset), dataloader(testset)
+    return dataloader(trainset, shuffle=dataset_name in _datasets_supporting_shuffle), dataloader(testset)
         
     
     batch_size, num_workers
 
 _datasets_base_folder = '/media/data1/idokessler'
 _datasets_get_func = {}
+_datasets_supporting_shuffle = []
 
 _normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 _transform_test_cifar10 = transforms.Compose([
                                         transforms.ToTensor(), _normalize])
 _transform_train_cifar10 = transform=transforms.Compose([
                                         transforms.RandomHorizontalFlip(),
-                                        transforms.RandomCrop(32, 4),
+                                        transforms.ColorJitter(0.3,0.3,0.3,0.3),
                                         transforms.ToTensor(),
                                         transforms.RandomErasing(), _normalize])
-    
+
 def _get_cifar10():
     return CIFAR10(root=f'{_datasets_base_folder}/cifar10', train=True, download=True, transform=_transform_train_cifar10), \
             CIFAR10(root=f'{_datasets_base_folder}/cifar10', train=False, transform=_transform_test_cifar10)
 
 _datasets_get_func['cifar10'] = _get_cifar10
+_datasets_supporting_shuffle += ['cifar10']
+def _get_imagenet():
+    return CIFAR10(root=f'{_datasets_base_folder}/cifar10', train=True, download=True, transform=_transform_train_cifar10), \
+            CIFAR10(root=f'{_datasets_base_folder}/cifar10', train=False, transform=_transform_test_cifar10)
+
+_datasets_get_func['cifar10'] = _get_cifar10
+
+
+
+
+
 
 class _H5Dataset(torch.utils.data.Dataset):
     def __init__(self, h5_path, x_database_name, y_database_name):

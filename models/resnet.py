@@ -100,7 +100,7 @@ class ResNet(nn.Module):
             self.in_planes = planes
 
         return nn.Sequential(*layers)
-
+    
     def forward(self, x):
         x = self.pre_layer(x)
         x = self.layer1(x)

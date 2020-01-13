@@ -1,0 +1,10 @@
+- Check how efficient net generalize on cifar10
+    1. Setting up
+    2. 256Batch too big.
+    linearcycle is weird. Didn't learn because of fault inr lr.
+        Also started loading resnet110 to check if I can maybe use x more networks and "weight" their output to create some feedback look which is worth while.
+        Also need to see if one can mabye add noise to some pretrained model to try to get better results from it. (assuming the data gets "less informative" maybe adding noise to the weoghts will results in better preformence. Like trying to shake the network to look in another direction.
+        Another thing to try is the Polyak averaging (setting the network weights to be the weighted average every few iteration so that maybe one can get to better locations this way (jump to this point every few epochs))
+    3. Finished programming first version of the combined weights results
+        Also run the efficient net with cyclic repeats with lr of between 1e-1 and 1e-3 but overall got best results of 0.77 accyracy. Maybe try freezing less and less each time? Like fast-ai sugested?
+        

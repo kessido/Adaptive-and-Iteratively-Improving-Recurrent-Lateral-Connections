@@ -23,8 +23,8 @@ class TrainingManager():
             assert(is_log_exist(trial_name) == False)
     
     def train(self, model, optimizer, trainloader, testloader, 
-                    criterion_train, criterion_test, acc_train, acc_test,
-                    test_iter_each_x_train_iter=5, mean_range=100, save_rate=1000,
+                    criterion_train, criterion_test, acc_train, acc_test, lr_scheduler=None,
+                    test_iter_each_x_train_iter=5, mean_range=1000, save_rate=1000,
                     desc_update_rate=5, no_iterations=50000, device=torch.device('cpu')):
         from termcolor import colored
         print('Start training trial:', colored(self.trial_name, 'blue'), colored('is_trial', 'green' if self.is_trial else 'red'))
@@ -41,12 +41,14 @@ class TrainingManager():
         get_next = lambda it: map(lambda x: x.to(device), next(it))
         
         first=True
-        with tqdm(range(self.iter_no, no_iterations), initial=self.iter_no, total=no_iterations) as tq:
+        with tqdm(range(self.iter_no, no_iterations), initial=self.iter_no, total=no_iterations, mininterval=1) as tq:
             for i in tq:
                 optimizer.zero_grad()
                 tr_loss, tr_acc = self._iteration(model, criterion_train, acc_train, *get_next(trainiter))
                 tr_loss.backward()
                 optimizer.step()
+                if lr_scheduler is not None:
+                    lr_scheduler.step()
                 if i % test_iter_each_x_train_iter == 0 or first:
                     first = False
                     model.eval()
